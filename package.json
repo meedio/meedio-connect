@@ -214,7 +214,7 @@
     "vite-plugin-dts": "~3.4.0",
     "vite-plugin-eslint": "^1.8.1",
     "vite-plugin-pwa": "^0.19.2",
-    "vite-plugin-static-copy": "0.17.0",
+    "vite-plugin-static-copy": "2.3.2",
     "vite-tsconfig-paths": "^4.0.3",
     "vitest": "^2.1.9",
     "worker-plugin": "^5.0.1",
