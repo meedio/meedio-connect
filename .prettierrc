@@ -1,0 +1,15 @@
+{
+  "trailingComma": "all",
+  "singleQuote": true,
+  "printWidth": 120,
+  "endOfLine": "lf",
+  "semi": true,
+  "overrides": [
+    {
+      "files": ["frontend/**/*"],
+      "options": {
+        "trailingComma": "es5"
+      }
+    }
+  ]
+}

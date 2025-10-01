@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "es2020",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "typeRoots": [
+      "../../types",
+      "../../node_modules/@types",
+      "../../node_modules"
+    ],
+    "baseUrl": "src",
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@shared/constants": ["../constants/src/index.ts"]
+    },
+    "types": ["vitest/globals", "vite-plugin-svgr/client", "node", "src/types"]
+  },
+  "include": ["src", "./setupTests.ts"],
+  "exclude": ["../../types"]
+}

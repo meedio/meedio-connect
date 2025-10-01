@@ -1,0 +1,74 @@
+name: 'PROD-EU: Hetzner (connect.meedio.eu)'
+
+concurrency:
+  group: deploy-frontend-connect-open
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+
+jobs:
+  get-current-time:
+    runs-on: self-hosted-vms
+    timeout-minutes: 30
+    steps:
+      - name: Get current time
+        uses: josStorer/get-current-time@v2
+        id: current-time
+        with:
+          format: YYYYMMDDHHmmss
+    outputs:
+      time: ${{ steps.current-time.outputs.formattedTime }}
+
+  build:
+    needs: get-current-time
+    runs-on: self-hosted-vms
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Frontend Connect
+        uses: ./.github/actions/build-app
+        with:
+          new-version: 'main-${{ needs.get-current-time.outputs.time }}'
+          app-name: 'connect-open'
+          react-app-guest-matrix-url: ${{ secrets.MATRIX_GUEST_URL }}
+          react-app-matrix-url: ${{ secrets.MATRIX_URL }}
+          react-app-livekit-server-url: ${{ secrets.LIVEKIT_SOCKET }}
+          react-app-livekit-service-url: ${{ secrets.LIVEKIT_JWT_URL }}
+          react-app-alloy-url: ${{ secrets.ALLOY_URL}}
+          react-app-sentry-environment: 'production'
+          react-app-unleash-edge-url: ${{ secrets.UNLEASH_URL }}
+          react-app-feedback-url: ${{ secrets.FEEDBACK_URL }}
+          react-app-matrix-stores-version: '1.0.1'
+          container-name: 'ghcr.io/meedio/meedio-connect-open'
+          container-registry-username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
+          container-registry-token: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+          react-app-identity-server-url: ${{ secrets.IS_URL }}
+          vault-url: ${{ secrets.VAULT_URL }}
+
+  deploy:
+    needs: [build, get-current-time]
+    runs-on: self-hosted-vms
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Frontend Connect
+        uses: ./.github/actions/deploy
+        with:
+          version: 'main-${{ needs.get-current-time.outputs.time }}'
+          docker-container-name: 'ghcr.io/meedio/meedio-connect-open'
+          file-path: 'meedio-connect-open/1-connect.yaml'
+          yaml-path: '.spec.template.spec.containers.[0].image'
+          kubectl-namespace: ${{ secrets.K8S_NAMESPACE }}
+          kubectl-object: 'deployment/meedio-connect'
+          vault-url: ${{ secrets.VAULT_URL}}

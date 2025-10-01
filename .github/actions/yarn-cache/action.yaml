@@ -1,0 +1,68 @@
+name: Create Yarn cache
+description: Creates Yarn cache
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: true
+  cache-prefix:
+    description: Prefix for the cache key
+    required: true
+  cache-hash-file:
+    description: Hash file for the cache key
+    required: true
+  working-directory:
+    description: Working directory for the cache
+    required: true
+  reset-nx-cache:
+    description: Reset Nx cache (true/false)
+    required: false
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        check-latest: true
+
+    - name: Setup yarn
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: npm install -g yarn
+
+    - name: Cache Yarn dependencies
+      id: yarn-cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ inputs.working-directory }}/.yarn/cache
+          ${{ inputs.working-directory }}/**/node_modules
+        key: ${{ runner.os }}-yarn-key-v5-${{ inputs.cache-prefix }}-${{ hashFiles(inputs.cache-hash-file) }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-key-v5-${{ inputs.cache-prefix }}
+
+    - name: Install project dependencies
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install --immutable
+
+    - name: Yarn reload shared libs
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      if: steps.yarn-cache.outputs.cache-hit == 'true'
+      run: yarn reload-libs
+
+    - name: Check and Reset Nx Cache
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      if: steps.yarn-cache.outputs.cache-hit == 'true' && ${{ inputs.reset-nx-cache == 'true' }}
+      run: |
+        if [ -d "node_modules/.cache/nx" ]; then
+          echo "Nx cache exists, resetting..."
+          yarn nx reset
+        else
+          echo "No Nx cache found, proceeding..."
+        fi

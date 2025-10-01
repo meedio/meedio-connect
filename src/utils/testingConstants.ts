@@ -1,0 +1,25 @@
+const testingConstants = {
+  feedbackForm: 'feedbackForm',
+  joinBtn: 'joinBtn',
+  tosCheckbox: 'tosCheckbox',
+  roomActionsBlock: 'roomActionsBlock',
+  createRoomButton: 'createRoomButton',
+  kickButton: 'kickButton',
+  roomTitle: 'roomTitle',
+  endCallPopupCloseBtn: 'endCallPopupCloseBtn',
+  leaveMeeting: 'leaveMeeting',
+  copyButton: 'copyButton',
+  copyButtonIcon: 'copyButtonIcon',
+  joinEnterName: 'joinEnterName',
+  createRoomModal: 'createRoomModal',
+  submitFormButton: 'submitFormButton',
+  hangUpButton: 'hangUpButton',
+  peopleSidebarButton: 'peopleSidebarButton',
+  confirmKick: 'confirmKick',
+  optionsDropdown: 'optionsDropdown',
+  continueWithoutDevices: 'continueWithoutDevices',
+  addParticipantsModal: 'addParticipantsModal',
+  reviewRoomStepModal: 'reviewRoomStepModal',
+};
+
+export default testingConstants;

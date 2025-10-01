@@ -1,0 +1,69 @@
+{
+  "name": "meedio-connect",
+  "$schema": "./node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "src",
+  "projectType": "application",
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["src/**/*.{ts,tsx,js,jsx}"]
+      }
+    },
+    "tsc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "yarn tsc -b ./tsconfig.build.json --incremental"
+      }
+    },
+    "build": {
+      "dependsOn": [],
+      "options": {
+        "outputPath": "build"
+      },
+      "executor": "@nx/vite:build"
+    },
+    "dev": {
+      "executor": "nx:run-commands",
+      "options": {
+        "envFile": ".env.dev",
+        "command": "yarn nx run meedio-connect:serve"
+      }
+    },
+    "prod": {
+      "executor": "nx:run-commands",
+      "options": {
+        "envFile": ".env.prod",
+        "command": "yarn nx run meedio-connect:serve"
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "meedio-connect:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "meedio-connect:build:development",
+          "hmr": true
+        },
+        "production": {
+          "buildTarget": "meedio-connect:build:production",
+          "hmr": false
+        }
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{projectRoot}/coverage"],
+      "options": {
+        "config": "./vitest.config.ts",
+        "reportsDirectory": "./coverage",
+        "coverage": true
+      }
+    }
+  },
+  "tags": []
+}

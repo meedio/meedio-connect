@@ -1,0 +1,297 @@
+@import './assets/css/fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  @apply rounded-100 bg-primaryComp-50 h-3 w-3;
+}
+
+input[type='range']::-moz-range-thumb {
+  -moz-appearance: none;
+  @apply rounded-100 bg-primaryComp-50 h-3 w-3;
+}
+
+.bg-gradient-green {
+  background: linear-gradient(120.65deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%), #e6f2f0;
+}
+
+.bg-gradient-white {
+  background: linear-gradient(120.65deg, rgba(240, 242, 244, 0.4) 0%, rgba(240, 242, 244, 0.1) 100%);
+}
+
+[type='checkbox']:checked {
+  background-image: url('./assets/icons/CheckboxTickWhite.svg');
+}
+
+[type='checkbox']:disabled:checked {
+  background-image: url('./assets/icons/TickDisabled.svg');
+}
+
+.fc-event:hover & .fc-v-event {
+  background-color: transparent !important;
+  border-color: none !important;
+  color: none !important;
+  display: flex;
+}
+
+@layer base {
+  :root {
+    --fc-event-border-color: #007965;
+    --fc-event-text-color: #007965;
+    --fc-event-selected-overlay-color: #007965;
+    --fc-event-bg-color: #007965;
+    --primary10: #e6f2f0;
+    --primary20: #b3d7d1;
+    --primary30: #80bcb2;
+    --primary40: #4da193;
+    --primary50: #007965;
+    --primary60: #006d5b;
+    --primary70: #006151;
+    --primary80: #005547;
+    --primary90: #00493d;
+    --primary100: #003d33;
+    --primaryComp10: #e6f7f4;
+    --primaryComp20: #b3e7de;
+    --primaryComp30: #80d7c8;
+    --primaryComp40: #4dc7b2;
+    --primaryComp50: #00af91;
+    --primaryComp60: #009e83;
+    --primaryComp70: #008c74;
+    --primaryComp80: #007a66;
+    --primaryComp90: #006957;
+    --primaryComp100: #005849;
+    --primaryCompDark: #172d2e;
+    --secondary10: #fef3eb;
+    --secondary20: #fcdbc2;
+    --secondary30: #fac39a;
+    --secondary40: #f8aa71;
+    --secondary50: #f58634;
+    --secondary60: #dd792f;
+    --secondary70: #c46b2a;
+    --secondary80: #ac5e24;
+    --secondary90: #93501f;
+    --secondary100: #7b431a;
+    --secondaryComp10: #fff8e0;
+    --secondaryComp20: #fff0bf;
+    --secondaryComp30: #ffe694;
+    --secondaryComp40: #ffdb69;
+    --secondaryComp50: #ffcc29;
+    --secondaryComp60: #e6b825;
+    --secondaryComp70: #cca321;
+    --secondaryComp80: #b38f1d;
+    --secondaryComp90: #997a19;
+    --secondaryComp100: #806615;
+    --tertiary10: #fcf1ef;
+    --tertiary20: #f7d4ce;
+    --tertiary30: #f1b8ae;
+    --tertiary40: #eb9c8d;
+    --tertiary50: #e3715c;
+    --tertiary60: #cc6653;
+    --tertiary70: #b65a4a;
+    --tertiary80: #9f4f40;
+    --tertiary90: #884437;
+    --tertiary100: #72392e;
+    --gray0: #f5f5f6;
+    --gray5: #e5e6e6;
+    --gray10: #f8f9fa;
+    --gray20: #f0f2f4;
+    --gray30: #eaedf0;
+    --gray40: #d6dae1;
+    --gray50: #9ca7b6;
+    --gray60: #69788e;
+    --gray70: #505c6d;
+    --gray80: #414b58;
+    --gray90: #252a32;
+    --gray100: #1b2332;
+    --white: #ffffff;
+    --white10: rgba(255, 255, 255, 0.1);
+    --white20: rgba(255, 255, 255, 0.2);
+    --white30: rgba(255, 255, 255, 0.3);
+    --white40: rgba(255, 255, 255, 0.4);
+    --white50: rgba(255, 255, 255, 0.5);
+    --white60: rgba(255, 255, 255, 0.6);
+    --white70: rgba(255, 255, 255, 0.7);
+    --white72: rgba(255, 255, 255, 0.72);
+    --white80: rgba(255, 255, 255, 0.8);
+    --white90: rgba(255, 255, 255, 0.9);
+    --black: #1a1e23;
+    --black5: rgba(0, 0, 0, 0.05);
+    --black10: rgba(0, 0, 0, 0.1);
+    --black15: rgba(0, 0, 0, 0.15);
+    --black20: rgba(0, 0, 0, 0.2);
+    --black30: rgba(0, 0, 0, 0.3);
+    --black40: rgba(0, 0, 0, 0.4);
+    --black50: rgba(0, 0, 0, 0.5);
+    --black60: rgba(0, 0, 0, 0.6);
+    --black70: rgba(0, 0, 0, 0.7);
+    --black72: rgba(0, 0, 0, 0.72);
+    --black80: rgba(0, 0, 0, 0.8);
+    --black90: rgba(0, 0, 0, 0.9);
+    --alert5: #fde9eb;
+    --alert10: #fde9eb;
+    --alert50: #e3715c;
+    --alert100: #cc1a2d;
+    --error10: #fbd0d5;
+    --error50: #ee1e34;
+    --success10: #dcefe4;
+    --success50: #40d87e;
+    --success100: #27be64;
+    --warning10: #ffefe6;
+    --warning50: #fe701b;
+    --warning100: #c55f21;
+    --complementary50: #00af91;
+    --complementary20: #b3e7de;
+  }
+
+  h6 {
+    @apply heading-default text-[0.875rem] md:text-[0.75rem] md:tracking-[0.02em];
+  }
+
+  h5 {
+    @apply heading-default text-[1rem] md:text-[1.25rem];
+  }
+
+  h4 {
+    @apply heading-default text-[1.25rem] md:text-[1.5rem];
+  }
+
+  h3 {
+    @apply heading-default text-[1.5rem] md:text-[2rem];
+  }
+
+  h2 {
+    @apply heading-default text-[2rem] md:text-[2.5rem];
+  }
+
+  h1 {
+    @apply heading-default text-[2.5rem] md:text-[3rem];
+  }
+
+  p,
+  span {
+    @apply font-light leading-normal;
+  }
+}
+
+@layer utilities {
+  .logo-mobile {
+    width: 6.75rem;
+    height: 1.25rem;
+  }
+
+  .position-cursor {
+    left: 29.17%;
+    right: 20%;
+    top: 25%;
+    bottom: 15%;
+  }
+
+  .text-body-xxs {
+    font-size: 9px;
+    line-height: 16px;
+  }
+
+  .will-change-animation {
+    will-change: transform, width, height, opacity, box-shadow;
+  }
+
+  .text-size-xs {
+    font-size: 0.75rem;
+    line-height: 18px;
+  }
+
+  .text-size-sm {
+    font-size: 0.875rem;
+    line-height: 21px;
+  }
+
+  .text-size-md {
+    font-size: 1rem;
+    line-height: 24px;
+  }
+
+  .text-size-lg {
+    font-size: 1.125rem;
+    line-height: 27px;
+  }
+
+  .text-size-xl {
+    font-size: 1.375rem;
+    line-height: 33px;
+  }
+
+  .text-size-2xl {
+    font-size: 1.5rem;
+    line-height: 30px;
+  }
+
+  .bg-gradient-green {
+    background: linear-gradient(120.65deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%), #e6f2f0;
+  }
+
+  .bg-gradient-white {
+    background: linear-gradient(120.65deg, rgba(240, 242, 244, 0.4) 0%, rgba(240, 242, 244, 0.1) 100%);
+  }
+
+  .heading-default {
+    @apply font-semibold leading-normal md:leading-tight;
+  }
+
+  .bg-gradient-green {
+    background: linear-gradient(120.65deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%), #e6f2f0;
+  }
+
+  .bg-gradient-white {
+    background: linear-gradient(120.65deg, rgba(240, 242, 244, 0.4) 0%, rgba(240, 242, 244, 0.1) 100%);
+  }
+
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+.top-area-padding {
+  padding-top: env(safe-area-inset-top);
+}
+
+.bottom-area-padding {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-area-margin {
+  margin-bottom: env(safe-area-inset-bottom);
+}
+
+.side-area-padding {
+  padding-right: env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
+}
+
+/* Opera: Disabling the video Video-detach and Lucid-mode buttons */
+#detach-button-host {
+  display: none !important;
+}

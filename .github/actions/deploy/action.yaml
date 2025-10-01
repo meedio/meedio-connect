@@ -1,0 +1,110 @@
+name: Deploy Frontend
+description: Deploy Frontend
+inputs:
+  version:
+    description: 'Version of the frontend to deploy'
+    required: true
+  docker-container-name:
+    description: 'Docker container name for the frontend'
+    required: true
+  file-path:
+    description: 'Path to the YAML file for the frontend'
+    required: true
+  yaml-path:
+    description: 'Path to the image in the YAML file'
+    required: true
+  kubectl-namespace:
+    description: 'Kubernetes namespace for the frontend'
+    required: true
+  kubectl-object:
+    description: 'Kubernetes object for the frontend'
+    required: true
+  vault-url:
+    description: vault url for secrets
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Import Secrets
+      uses: hashicorp/vault-action@v2
+      with:
+        method: jwt
+        url: ${{ inputs.vault-url }}
+        role: github-pipeline
+        secrets: |
+          kv/data/flux-system/flux-webhook url | FLUX_WEBHOOK_URL ;
+          kv/data/flux-system/flux-webhook hash | FLUX_WEBHOOK_HASH ;
+          kv/data/flux-system/slack-webhook address | SLACK_WEBHOOK ;
+          kv/data/k8s-configuration/credentials config | K8s-CONFIG ;
+          kv/data/k8s-configuration/credentials token | K8s-TOKEN ;
+
+    - name: Checkout k8s-configuration
+      uses: actions/checkout@v4
+      with:
+        repository: meedio/k8s-configuration
+        token: ${{ env.K8s-TOKEN }}
+
+    - name: Set Directory & commit prefix names
+      shell: bash
+      run: |
+        echo "DIR_NAME=production-eu" >> $GITHUB_ENV
+        echo "COMMIT_PREFIX=Prod-eu" >> $GITHUB_ENV
+
+    - name: Create YAML for Dashboard Helm Release
+      uses: mikefarah/yq@v4.35.1
+      id: connect-yaml
+      with:
+        cmd: yq eval '${{ inputs.yaml-path }} = "${{ inputs.docker-container-name }}:${{ inputs.version }}"' clusters/${{ env.DIR_NAME }}/${{ inputs.file-path }} | base64
+
+    - name: Update version for Meedio Connect
+      shell: bash
+      run: |
+        echo "${{ steps.connect-yaml.outputs.result }}" | base64 -d > clusters/${{ env.DIR_NAME }}/${{ inputs.file-path }}
+        git config user.name meedio-connect-cicd
+        git config user.email meedio-connect-cicd@github.com
+        git add clusters/${{ env.DIR_NAME }}/${{ inputs.file-path }}
+        git diff --cached --quiet && echo "No changes to commit" && exit 0
+        git commit -m "${{ env.COMMIT_PREFIX }}: Update Meedio Connect Open version to ${{ inputs.version }}" -m "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        git pull --rebase origin main && git push
+
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v4
+
+    - name: Create kubeconfig file
+      shell: bash
+      run: |
+        KUBECONFIG=$(mktemp)
+        echo "${{ env.K8s-CONFIG }}" | base64 -d >> $KUBECONFIG
+        echo "KUBECONFIG=$KUBECONFIG" >> $GITHUB_ENV
+
+    - name: Get the current generation of the Dashboard Deployment
+      id: kube-object-generation
+      shell: bash
+      run: |
+        echo "OLD_GENERATION=$(kubectl -n ${{ inputs.kubectl-namespace }} get ${{ inputs.kubectl-object }} -o jsonpath='{.status.observedGeneration}')" >> $GITHUB_ENV
+
+    - name: Get the expected generation of the Deployment
+      shell: bash
+      run: |
+        old=${{ env.OLD_GENERATION }}
+        new="$(( old + 1 ))"
+        echo "new_gen=$new"
+        echo "NEW_GENERATION=$new" >> $GITHUB_ENV
+
+    - name: Trigger FluxCD Webhook to update k8s-configuration repository
+      shell: bash
+      run: |
+        curl ${{ env.FLUX_WEBHOOK_URL }} -X POST -H "X-Signature: ${{ env.FLUX_WEBHOOK_HASH }}" -d "" -v
+
+    - name: Wait for deploy to start
+      shell: bash
+      run: kubectl -n ${{ inputs.kubectl-namespace }} wait --timeout=300s ${{ inputs.kubectl-object }} --for=jsonpath=status.observedGeneration=${{ env.NEW_GENERATION }}
+
+    - name: Wait for deploy to finish
+      shell: bash
+      run: kubectl -n ${{ inputs.kubectl-namespace }} rollout status --timeout=300s ${{ inputs.kubectl-object }}
+
+    - name: Checkout for post action
+      if: ${{ always() }}
+      uses: actions/checkout@v4

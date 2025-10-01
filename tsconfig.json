@@ -1,0 +1,43 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "es2020",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+    "typeRoots": ["./types", "./node_modules/@types", "./node_modules"],
+    "baseUrl": "src",
+    "noFallthroughCasesInSwitch": true,
+    "paths": {
+      "@shared/components/assets/*": ["../libs/components/src/assets/*"],
+      "@shared/components/*": ["../libs/components/src/lib/*"],
+      "@shared/utils": ["../libs/components/src/utils/utils"],
+      "@shared/constants": ["../libs/constants/src/index.ts"],
+      "@meedio-connect/testing-constants": ["./src/utils/testingConstants.ts"]
+    },
+    "types": [
+      "node",
+      "vitest/globals",
+      "vite/client",
+      "vite-plugin-pwa/client",
+      "vite-plugin-svgr/client",
+      "@testing-library/jest-dom",
+      "@types/dom-mediacapture-transform"
+    ]
+  },
+  "include": ["src", "./node_modules/matrix-js-sdk/src/@types/*.d.ts"],
+  "exclude": ["types"]
+}

@@ -1,0 +1,11 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+>
+  <rect width="3" height="6" rx="0" ry="0" transform="translate(5 14)" fill="#E3715C" />
+  <rect width="3" height="11" rx="0" ry="0" transform="translate(11 9)" fill="#575757" stroke-width="0" />
+  <rect width="3" height="16" rx="0" ry="0" transform="translate(17 4)" fill="#575757" stroke-width="0" />
+</svg>

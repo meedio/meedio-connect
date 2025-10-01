@@ -1,0 +1,164 @@
+name: Build Frontend
+description: Build the Frontend
+
+inputs:
+  new-version:
+    description: 'New application version'
+    required: true
+  app-name:
+    description: 'Application name (connect or dashboard)'
+    required: true
+  react-app-guest-matrix-url:
+    description: 'Guest Matrix URL'
+    required: false
+  react-app-matrix-url:
+    description: 'Matrix URL'
+    required: false
+  react-app-livekit-server-url:
+    description: 'Livekit server URL'
+    required: false
+  react-app-livekit-service-url:
+    description: 'Livekit service URL'
+    required: false
+  react-app-alloy-url:
+    description: 'Alloy URL'
+    required: false
+  react-app-sentry-environment:
+    description: 'Sentry environment'
+    required: false
+  react-app-unleash-edge-url:
+    description: 'Unleash edge URL'
+    required: false
+  react-app-backend-url:
+    description: 'Backend URL'
+    required: false
+  react-app-feedback-url:
+    description: 'Feedback URL'
+    required: true
+  react-app-identity-server-url:
+    description: 'Identity service url'
+    required: false
+  react-app-matrix-stores-version:
+    description: 'Matrix stores version'
+    required: false
+    default: '1.0.0'
+  container-registry-username:
+    description: 'Container registry username'
+    required: false
+  container-registry-token:
+    description: 'Container registry token'
+    required: false
+  container-name:
+    description: 'Docker container name'
+    required: true
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: '20'
+  cache-prefix:
+    description: Prefix for the cache key
+    required: false
+    default: 'frontend'
+  cache-hash-file:
+    description: Hash file for the cache key
+    required: false
+    default: 'yarn.lock'
+  working-directory:
+    description: Working directory for the cache
+    required: false
+    default: '.'
+  vault-url:
+    description: vault url for secrets
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Import Secrets
+      uses: hashicorp/vault-action@v2
+      with:
+        method: jwt
+        url: ${{ inputs.vault-url }}
+        role: github-pipeline
+        secrets: |
+          kv/data/meedio-connect/deployment sentry-dsn | SENTRY_DSN ;
+          kv/data/meedio-connect/deployment google-client-id | GOOGLE_CLIENT_ID ;
+          kv/data/faro/faro-shared-secret key | ALLOY_API_KEY ;
+          kv/data/unleash/connect-frontend-tokens tokens | UNLEASH_FRONTEND_TOKENS ;
+          kv/data/feedback-api/secret API_SUBMIT_TOKEN | FEEDBACK_API_TOKEN ;
+
+    - name: Setup frontend
+      uses: ./.github/actions/yarn-cache
+      with:
+        node-version: '${{ inputs.node-version }}'
+        cache-prefix: ${{ inputs.cache-prefix }}
+        cache-hash-file: ${{ inputs.cache-hash-file }}
+        working-directory: ${{ inputs.working-directory }}
+        reset-nx-cache: 'true'
+
+    - name: Write environment variables to .env.deployment file
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      env:
+        REACT_APP_GUEST_MATRIX_URL: ${{ inputs.react-app-guest-matrix-url }}
+        REACT_APP_MATRIX_URL: ${{ inputs.react-app-matrix-url }}
+        REACT_APP_LIVEKIT_SERVER_URL: ${{ inputs.react-app-livekit-server-url }}
+        REACT_APP_LIVEKIT_SERVICE_URL: ${{ inputs.react-app-livekit-service-url }}
+        REACT_APP_MATRIX_STORES_VERSION: ${{ inputs.react-app-matrix-stores-version }}
+        REACT_APP_ALLOY_URL: ${{ inputs.react-app-alloy-url }}
+        REACT_APP_ALLOY_API_KEY: ${{ env.ALLOY_API_KEY }}
+        REACT_APP_SENTRY_RELEASE: ${{ inputs.new-version }}
+        REACT_APP_SENTRY_DSN: ${{ env.SENTRY_DSN }}
+        REACT_APP_SENTRY_ENVIRONMENT: ${{ inputs.react-app-sentry-environment }}
+        REACT_APP_UNLEASH_EDGE_URL: ${{ inputs.react-app-unleash-edge-url }}
+        REACT_APP_UNLEASH_API_KEY: ${{ env.UNLEASH_FRONTEND_TOKENS }}
+        REACT_APP_BACKEND_URL: ${{ inputs.react-app-backend-url }}
+        REACT_APP_FEEDBACK_TOKEN: ${{ env.FEEDBACK_API_TOKEN }}
+        REACT_APP_FEEDBACK_URL: ${{ inputs.react-app-feedback-url }}
+        REACT_APP_IDENTITY_SERVER_URL: ${{ inputs.react-app-identity-server-url }}
+        REACT_APP_GOOGLE_CLIENT_ID: ${{ env.GOOGLE_CLIENT_ID }}
+      run: |
+        touch ./.env.deployment
+        env | grep "REACT_APP" | while IFS= read -r line
+        do
+          echo "$line" >> ./.env.deployment
+        done
+        cat ./.env.deployment
+
+    - name: Build frontend
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: yarn nx build
+      env:
+        CI: false
+
+    - name: Mount environment variables into code
+      working-directory: ${{ inputs.working-directory }}
+      shell: bash
+      run: npx import-meta-env -x deployment.env -e ./.env.deployment
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Login to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ inputs.container-registry-username }}
+        password: ${{ inputs.container-registry-token }}
+
+    - name: Build and push image
+      id: docker_build
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: '${{ inputs.container-name }}:${{ inputs.new-version }}'
+        file: Dockerfile
+        labels: |
+          org.opencontainers.image.source = "https://github.com/meedio/meedio"
+          org.opencontainers.image.title = "meedio-${{ inputs.app-name }}"
+          org.opencontainers.image.ref.name = "meedio/meedio-${{ inputs.app-name }}"
