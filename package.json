@@ -209,7 +209,7 @@
     "sass": "^1.55.0",
     "tslib": "^2.0.0",
     "typescript": "^5.5.3",
-    "vite": "^4.5.14",
+    "vite": "^5.4.20",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-dts": "~3.4.0",
     "vite-plugin-eslint": "^1.8.1",
