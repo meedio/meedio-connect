@@ -45,7 +45,7 @@ jobs:
           react-app-livekit-server-url: ${{ secrets.LIVEKIT_SOCKET }}
           react-app-livekit-service-url: ${{ secrets.LIVEKIT_JWT_URL }}
           react-app-alloy-url: ${{ secrets.ALLOY_URL}}
-          react-app-sentry-environment: 'production'
+          react-app-sentry-environment: 'connect-open'
           react-app-unleash-edge-url: ${{ secrets.UNLEASH_URL }}
           react-app-feedback-url: ${{ secrets.FEEDBACK_URL }}
           react-app-matrix-stores-version: '1.0.1'
