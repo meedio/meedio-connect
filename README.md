@@ -109,3 +109,15 @@ The configuration is a list of Focus configs:
     },
 ]
 ```
+
+## Notice of use of 3rd party services
+
+This project uses open-source software. Each package is provided by its respective authors under its own license. Third-party licenses apply to their components.
+
+To see a full list of 3rd party services uses see THIRD_PARTY_NOTICES.csv or generate a list using the following command:
+
+```bash
+npx license-checker-rseidelsohn --production --relativeLicensePath --csv --out THIRD_PARTY_NOTICES.csv
+```
+
+Note: Some packages are consumed from vendor tarballs (livekit-client, matrix-js-sdk). Their licenses remain those of the upstream projects from which the tarballs were built.
