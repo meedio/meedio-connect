@@ -2,7 +2,6 @@
 
 Meedio front end repository
 
-- [Live demo](https://connect.meedio.eu/)
 - [Meedio.eu enterprise demo](https://meedio.eu/)
 
 ## License
